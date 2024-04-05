@@ -70,9 +70,9 @@ class UserController extends Controller
         try {
             $credentials = $request->only('email', 'password');
 
-            if (Auth:: guard('user')->attempt($credentials)) {
-                $user = Auth::guard('user')->user();
-                $token =$user->createToken('hello world')->plainTextToken;
+            if (Auth::attempt($credentials)) {
+                $user = Auth::user();
+                $token =$user->createToken('userAuthPhitPrTl',['role:user'])->plainTextToken;
                 return response()->json([
                     'message' => 'Login successfully',
                     'token' => $token
