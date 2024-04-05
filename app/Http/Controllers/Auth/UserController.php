@@ -72,6 +72,11 @@ class UserController extends Controller
 
             if (Auth::attempt($credentials)) {
                 $user = Auth::user();
+
+                if($user->tokens()){
+                    $user->tokens()->delete();
+                };
+
                 $token =$user->createToken('userAuthPhitPrTl',['role:user'])->plainTextToken;
                 return response()->json([
                     'message' => 'Login successfully',

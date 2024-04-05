@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\ProductImg;
+use App\Models\Rating;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -18,9 +19,11 @@ class ProductController extends Controller
      */
     public function index()
     {
+
         $product = Product::all();
         return response()->json([
-            'data' => ProductResource::collection($product)
+            'data' => ProductResource::collection($product),
+            
         ]);
     }
 
@@ -30,57 +33,57 @@ class ProductController extends Controller
     public function store(Request $request)
     {
 
-        $validation = Validator::make($request->all(),[
+        $validation = Validator::make($request->all(), [
             'title' => 'required',
             'price' => 'required|integer',
             'description' => 'required',
             'image' => ['required']
         ]);
 
-        if($validation->fails()){
+        if ($validation->fails()) {
             return response()->json([
                 'message' => $validation->errors()
             ]);
         };
 
-      try{
-        $products = new Product();
-        $products->title = $request->title;
-        $products->price = $request->price;
-        $products->description = $request->description;
-        $products->save();
+        try {
+            $products = new Product();
+            $products->title = $request->title;
+            $products->price = $request->price;
+            $products->description = $request->description;
+            $products->save();
 
 
-        if($request->hasFile('image')){
-          $files =   $request->file('image');
-          foreach($files as $file){
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $dataFile =  $file->storeAs('public/upload',$fileName);
-            $products->productImg()->create([
-                'extension' => $file->getClientOriginalExtension(),
-                'image' => $dataFile
+            if ($request->hasFile('image')) {
+                $files =   $request->file('image');
+                foreach ($files as $file) {
+                    $fileName = time() . '_' . $file->getClientOriginalName();
+                    $dataFile =  $file->storeAs('public/upload', $fileName);
+                    $products->productImg()->create([
+                        'extension' => $file->getClientOriginalExtension(),
+                        'image' => $dataFile
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'message' => "Create Successfully"
+            ], 201);
+        } catch (Exception $err) {
+            return response()->json([
+                'message' => $err
             ]);
         }
-
-       }
-
-       return response()->json([
-        'message' =>"Create Successfully"
-       ],201);
-      }catch(Exception $err){
-         return response()->json([
-        'message' => $err
-       ]);
-      }
-
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
+    public function show(Request $request)
     {
-        //
+        $product = Product::findOrFail($request->id);
+        $rating  = Rating::where('product_id','=',$product->id);
+        return $rating->get();
     }
 
     /**

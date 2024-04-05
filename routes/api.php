@@ -19,7 +19,11 @@ Route::prefix('v1')->group(function () {
     });
 
 
-    Route::get('/product', [ProductController::class,'index']);
+    // product
+    Route::prefix('product')->controller(ProductController::class)->group(function(){
+       Route::get('/', 'index');
+       Route::get('/{id}','show');
+    });
 
     // seller
     // Route::prefix('seller')->controller(ProductController::class)->group(function(){
