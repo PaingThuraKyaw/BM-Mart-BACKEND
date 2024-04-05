@@ -1,15 +1,21 @@
 <?php
 
+use App\Http\Controllers\Auth\UserController;
 use App\Http\Controllers\Product\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
 
+
+Route::prefix('v1')->group(function(){
+    // Auth
+Route::prefix('/user')->controller(UserController::class)->group(function(){
+    Route::post('/register','register');
+    Route::post('/login','login');
+});
 
 Route::prefix('/seller/')->controller(ProductController::class)->group(function(){
     Route::get('/product','index');
     Route::post('/product','store');
 } );
+});
