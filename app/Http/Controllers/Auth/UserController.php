@@ -72,23 +72,18 @@ class UserController extends Controller
 
             if (Auth::attempt($credentials)) {
                 $user = Auth::user();
-
-                if($user->tokens()){
-                    $user->tokens()->delete();
-                };
-
+                $user->tokens()->delete();
                 $token =$user->createToken('userAuthPhitPrTl',['role:user'])->plainTextToken;
                 return response()->json([
                     'message' => 'Login successfully',
-                    'token' => $token
+                    'token' => $token,
 
                 ], 201);
             }
 
-
             return response()->json([
-                'message' => 'Login fail'
-            ], 400);
+                'message' => 'Unauthorized'
+            ], 401);
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Login fail',

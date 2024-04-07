@@ -18,5 +18,9 @@ class userMiddleware
         if (auth()->user()->tokenCan('role:user')) {
             return $next($request);
         }
+
+        return response()->json([
+            'message' => "Unauthorized"
+        ],401);
     }
 }
