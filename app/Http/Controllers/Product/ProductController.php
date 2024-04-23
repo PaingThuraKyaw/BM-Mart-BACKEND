@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductDetailResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\ProductImg;
@@ -19,7 +20,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        
+
 
         $product = Product::all();
         return response()->json([
@@ -83,8 +84,7 @@ class ProductController extends Controller
     public function show(Request $request)
     {
         $product = Product::findOrFail($request->id);
-        $rating  = Rating::where('product_id','=',$product->id);
-        return $rating->get();
+        return new ProductDetailResource($product) ;
     }
 
     /**

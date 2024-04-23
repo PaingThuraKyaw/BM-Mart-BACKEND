@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Product;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Rating as ResourcesRating;
 use App\Models\Product;
 use App\Models\Rating;
+use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -17,8 +19,10 @@ class RatingController extends Controller
     public function index()
     {
         $rating = new Rating();
+
+        $review = new Review();
         return response()->json([
-            'message' => $rating->all()
+            'message' => ResourcesRating::collection($rating->all())
         ]);
     }
 
@@ -30,6 +34,7 @@ class RatingController extends Controller
         $validate = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,id',
             'rating' => 'required|in:1,2,3,4,5',
+            'review' => 'required|min:1'
         ]);
 
         if ($validate->fails()) {
@@ -54,7 +59,16 @@ class RatingController extends Controller
         $rating->rating = $request->rating;
         $rating->save();
 
-        return response()->json(['rating' => $rating], 201);
+        $review =  Review::create([
+            'review' => $request->review,
+            'rating_id' => $rating->id
+        ]);
+
+
+        return response()->json([
+            'rating' => $rating,
+            'review' => $review
+        ], 201);
     }
 
     /**
